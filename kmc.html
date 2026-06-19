@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fake News Detector Pro</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    min-height:100vh;
+    background:linear-gradient(135deg,#0f172a,#1e293b,#2563eb);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+}
+
+.container{
+    width:100%;
+    max-width:900px;
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(20px);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:25px;
+    padding:30px;
+    color:white;
+    box-shadow:0 10px 40px rgba(0,0,0,.3);
+}
+
+.header{
+    text-align:center;
+    margin-bottom:30px;
+}
+
+.header h1{
+    font-size:3rem;
+    margin-bottom:10px;
+}
+
+.header p{
+    color:#cbd5e1;
+}
+
+textarea{
+    width:100%;
+    height:200px;
+    resize:none;
+    border:none;
+    outline:none;
+    padding:20px;
+    border-radius:15px;
+    background:#fff;
+    color:#111;
+    font-size:16px;
+}
+
+.actions{
+    display:flex;
+    justify-content:center;
+    margin-top:20px;
+}
+
+button{
+    padding:15px 35px;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+    font-size:16px;
+    font-weight:700;
+    background:#2563eb;
+    color:white;
+    transition:.3s;
+}
+
+button:hover{
+    transform:translateY(-3px);
+    background:#1d4ed8;
+}
+
+.result{
+    margin-top:30px;
+    display:none;
+}
+
+.card{
+    padding:25px;
+    border-radius:20px;
+    text-align:center;
+}
+
+.real{
+    background:rgba(16,185,129,.2);
+    border:2px solid #10b981;
+}
+
+.fake{
+    background:rgba(239,68,68,.2);
+    border:2px solid #ef4444;
+}
+
+.score{
+    font-size:50px;
+    font-weight:bold;
+    margin:15px 0;
+}
+
+.badge{
+    display:inline-block;
+    padding:10px 20px;
+    border-radius:30px;
+    font-weight:bold;
+    margin-top:10px;
+}
+
+.realBadge{
+    background:#10b981;
+}
+
+.fakeBadge{
+    background:#ef4444;
+}
+
+.history{
+    margin-top:30px;
+}
+
+.history h3{
+    margin-bottom:15px;
+}
+
+.list{
+    display:grid;
+    gap:10px;
+}
+
+.item{
+    background:rgba(255,255,255,.08);
+    padding:15px;
+    border-radius:10px;
+}
+
+.footer{
+    text-align:center;
+    margin-top:20px;
+    color:#cbd5e1;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="header">
+<h1>📰 Fake News Detector</h1>
+<p>AI Inspired Student Project</p>
+</div>
+
+<textarea id="newsInput" placeholder="Paste news headline or article here..."></textarea>
+
+<div class="actions">
+<button onclick="analyzeNews()">Analyze News</button>
+</div>
+
+<div class="result" id="resultBox">
+<div class="card" id="card">
+<h2 id="resultText"></h2>
+<div class="score" id="score"></div>
+<div id="badge"></div>
+</div>
+</div>
+
+<div class="history">
+<h3>Analysis History</h3>
+<div class="list" id="history"></div>
+</div>
+
+<div class="footer">
+Professional Fake News Detector Project
+</div>
+
+</div>
+
+<script>
+const fakeKeywords = [
+"shocking",
+"secret",
+"miracle",
+"conspiracy",
+"breaking",
+"unbelievable",
+"click here",
+"100%",
+"guaranteed",
+"viral",
+"exclusive",
+"exposed",
+"government hiding",
+"you won't believe"
+];
+
+let historyData=[];
+
+function analyzeNews(){
+
+const text=document.getElementById("newsInput").value;
+
+if(text.trim()===""){
+alert("Enter News Content");
+return;
+}
+
+let score=0;
+
+fakeKeywords.forEach(word=>{
+if(text.toLowerCase().includes(word)){
+score+=8;
+}
+});
+
+const caps=(text.match(/[A-Z]/g)||[]).length;
+if(caps>30) score+=15;
+
+if(text.includes("!!!")) score+=10;
+
+if(score>100) score=100;
+
+const resultBox=document.getElementById("resultBox");
+const resultText=document.getElementById("resultText");
+const scoreText=document.getElementById("score");
+const card=document.getElementById("card");
+const badge=document.getElementById("badge");
+
+resultBox.style.display="block";
+
+if(score>=50){
+
+resultText.innerHTML="⚠️ Likely Fake News";
+scoreText.innerHTML=score+"%";
+card.className="card fake";
+badge.className="badge fakeBadge";
+badge.innerHTML="Fake News";
+
+}else{
+
+let trust=100-score;
+
+resultText.innerHTML="✅ Likely Real News";
+scoreText.innerHTML=trust+"%";
+card.className="card real";
+badge.className="badge realBadge";
+badge.innerHTML="Real News";
+}
+
+historyData.unshift({
+text:text.substring(0,60)+"...",
+status:score>=50?"Fake":"Real"
+});
+
+renderHistory();
+}
+
+function renderHistory(){
+
+const history=document.getElementById("history");
+
+history.innerHTML="";
+
+historyData.forEach(item=>{
+
+history.innerHTML+=`
+<div class="item">
+<strong>${item.status}</strong><br>
+${item.text}
+</div>
+`;
+
+});
+
+}
+</script>
+
+</body>
+</html> 
